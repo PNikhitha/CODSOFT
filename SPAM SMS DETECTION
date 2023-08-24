@@ -1,0 +1,45 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report
+
+# Sample SMS data (Replace this with your actual dataset)
+data = {
+    'sms': [
+        "Congratulations! You won a free gift card.",
+        "Please confirm your appointment for tomorrow.",
+        "Hey, how's it going?",
+        "URGENT: Your account has been locked. Click the link to reset your password.",
+        "Reminder: Don't forget to attend the meeting at 2 PM."
+    ],
+    'label': ['spam', 'legitimate', 'legitimate', 'spam', 'legitimate']
+}
+
+# Create a DataFrame from the data
+df = pd.DataFrame(data)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(df['sms'], df['label'], test_size=0.2, random_state=42)
+
+# Create TF-IDF vectorizer
+vectorizer = TfidfVectorizer(stop_words='english')
+
+# Transform the training and testing data
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+
+# Create and train the Naive Bayes classifier
+classifier = MultinomialNB()
+classifier.fit(X_train_tfidf, y_train)
+
+# Make predictions on the test set
+y_pred = classifier.predict(X_test_tfidf)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+# Print classification report
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
